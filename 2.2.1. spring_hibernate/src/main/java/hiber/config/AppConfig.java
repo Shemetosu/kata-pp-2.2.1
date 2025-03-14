@@ -23,10 +23,13 @@ import java.util.Properties;
 @ComponentScan(value = "hiber")
 public class AppConfig {
 
-   @Autowired
-   private Environment env;
+   private final Environment env;
 
-   @Bean
+    public AppConfig(Environment env) {
+        this.env = env;
+    }
+
+    @Bean
    public DataSource getDataSource() {
       DriverManagerDataSource dataSource = new DriverManagerDataSource();
       dataSource.setDriverClassName(env.getProperty("db.driver"));
@@ -36,13 +39,15 @@ public class AppConfig {
       return dataSource;
    }
 
+
    @Bean
    public LocalSessionFactoryBean getSessionFactory() {
       LocalSessionFactoryBean factoryBean = new LocalSessionFactoryBean();
       factoryBean.setDataSource(getDataSource());
-      
+
       Properties props=new Properties();
       props.put("hibernate.show_sql", env.getProperty("hibernate.show_sql"));
+      props.put("hibernate.format_sql", env.getProperty("hibernate.format_sql"));
       props.put("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));
 
       factoryBean.setHibernateProperties(props);
